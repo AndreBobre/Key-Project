@@ -1,55 +1,38 @@
-// constants won't change. They're used here to set pin numbers:
-const int hallPin = 4;     // the number of the hall effect sensor pin
-const int hallPin2 = 5;
-const int hallPin3 = 6;
-const int ledPin =  13;     // the number of the LED pin
-// variables will change:
-int hallState = 0;          // variable for reading the hall sensor status
-int hallState2 = 0;
-int hallState3 = 0;
+//typedef enum {input, output, input_pullup} io;
+#include <Maksymov_BitArray.h>
+
+#define INITIAL_PIN 5
+#define NUM_OF_PINS 3
+
+
+BitArray halls_array = BitArray(NUM_OF_PINS);
 
 void setup() {
-
-  // initialize the LED pin as an output:
-  pinMode(ledPin, OUTPUT);      
-  // initialize the hall effect sensor pin as an input:
-  pinMode(hallPin, INPUT);
-  pinMode(hallPin2, INPUT);
-  pinMode(hallPin3, INPUT);
-
+  Serial.begin(9600);
+  setup_pins_array(INITIAL_PIN, NUM_OF_PINS, INPUT);
+  delay(500);
 }
 
-void loop(){
+void setup_pins_array(int begin_index, int num_of_pins, int io) {
+  for(int index = begin_index; index < begin_index + num_of_pins; index++) pinMode(index, io);
+}
 
-  // read the state of the hall effect sensor:
-  hallState = digitalRead(hallPin);
-  hallState2 = digitalRead(hallPin2);
-  hallState3 = digitalRead(hallPin3);
-
-  if (hallState == LOW) {     
-    // turn LED on:    
-    digitalWrite(ledPin, HIGH);  
-  } 
-  else {
-    // turn LED off:
-    digitalWrite(ledPin, LOW); 
-  }
-  
-  if (hallState2 == LOW) {     
-    // turn LED on:    
-    digitalWrite(ledPin, HIGH);  
-  } 
-  else {
-    // turn LED off:
-    digitalWrite(ledPin, LOW); 
-  }
-
-  if (hallState3 == LOW) {     
-    // turn LED on:    
-    digitalWrite(ledPin, HIGH);  
-  } 
-  else {
-    // turn LED off:
-    digitalWrite(ledPin, LOW); 
+void read_data_from_sensors() {
+  for(register int index = 0; index < NUM_OF_PINS; index++) {
+    halls_array.setBit(digitalRead(INITIAL_PIN + index), index);
   }
 }
+
+void loop() {
+  read_data_from_sensors();
+  debug();
+}
+//-------
+void debug() {
+  for(int index = 0; index < NUM_OF_PINS; index++)
+    Serial.print(halls_array.getBool(index));
+  Serial.println("\n---");
+
+   delay(2000);
+}
+//-------
